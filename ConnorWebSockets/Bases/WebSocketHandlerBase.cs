@@ -10,12 +10,13 @@ namespace ConnorWebSockets.Bases
 {
     public abstract class WebSocketHandlerBase<T> where T : IWebSocket
     {
-        protected IConnectionManager<T> WebSocketConnectionManager { get; set; }
+        public IConnectionManager<T> WebSocketConnectionManager { get; set; }
         protected ILogger Logger { get; set; }
 
         public WebSocketHandlerBase(IConnectionManager<T> webSocketConnectionManager, ILogger logger)
         {
             WebSocketConnectionManager = webSocketConnectionManager;
+            Logger = logger;
         }
 
         public virtual async Task<string> OnConnected(T socket)
