@@ -40,11 +40,18 @@ namespace ConnorWebSockets.Bases
             sockets.TryRemove(id, out var socket);
             if (socket != null)
             {
-                await socket.Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by the ConnectionManager", CancellationToken.None);
+                try
+                {
+                    await socket.Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by the ConnectionManager", CancellationToken.None);
+                }
+                catch (Exception)
+                {
+                    // Handle Any Bad Handshake Closures
+                }
             }
         }
 
-        private string CreateConnectionId()
+        private static string CreateConnectionId()
         {
             return Guid.NewGuid().ToString();
         }
