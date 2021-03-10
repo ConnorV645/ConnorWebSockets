@@ -21,33 +21,40 @@ namespace ConnorWebSockets.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            if (!context.WebSockets.IsWebSocketRequest)
+            try
             {
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                return;
+                if (!context.WebSockets.IsWebSocketRequest)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return;
+                }
+
+                var socket = await context.WebSockets.AcceptWebSocketAsync();
+                var socketType = (T)Activator.CreateInstance(typeof(T), socket);
+                await webSocketHandler.OnConnected(socketType);
+
+                await Receive(socketType, async (result, buffer) =>
+                {
+                    if (result.MessageType == WebSocketMessageType.Text)
+                    {
+                        await webSocketHandler.ReceiveAsync(socketType, result, buffer);
+                        return;
+                    }
+
+                    else if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        await webSocketHandler.OnDisconnected(socketType);
+                        return;
+                    }
+
+                });
+
+                // no next for web sockets
             }
-
-            var socket = await context.WebSockets.AcceptWebSocketAsync();
-            var socketType = (T)Activator.CreateInstance(typeof(T), socket);
-            await webSocketHandler.OnConnected(socketType);
-
-            await Receive(socketType, async (result, buffer) =>
+            catch (WebSocketException)
             {
-                if (result.MessageType == WebSocketMessageType.Text)
-                {
-                    await webSocketHandler.ReceiveAsync(socketType, result, buffer);
-                    return;
-                }
-
-                else if (result.MessageType == WebSocketMessageType.Close)
-                {
-                    await webSocketHandler.OnDisconnected(socketType);
-                    return;
-                }
-
-            });
-
-            // no next for web sockets
+                // Most Likely a Bad close
+            }
         }
 
         private async Task Receive(T socketType, Action<WebSocketReceiveResult, byte[]> handleMessage)
