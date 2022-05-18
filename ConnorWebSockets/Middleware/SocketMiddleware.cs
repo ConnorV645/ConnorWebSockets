@@ -10,13 +10,17 @@ namespace ConnorWebSockets.Middleware
 {
     public class SocketMiddleware<Y, T> where Y : WebSocketHandlerBase<T> where T : WebSocketBase
     {
-        private readonly RequestDelegate next;
-        private readonly Y webSocketHandler;
+        protected readonly RequestDelegate next;
+        protected readonly Y webSocketHandler;
+        protected readonly int bufferSize;
 
-        public SocketMiddleware(RequestDelegate next, Y webSocketHandler)
+        public const int FourKB = 1024 * 4;
+
+        public SocketMiddleware(RequestDelegate next, Y webSocketHandler, int bufferSize = FourKB)
         {
             this.next = next;
             this.webSocketHandler = webSocketHandler;
+            this.bufferSize = bufferSize;
         }
 
         public async Task Invoke(HttpContext context)
@@ -38,13 +42,14 @@ namespace ConnorWebSockets.Middleware
                     if (result.MessageType == WebSocketMessageType.Text)
                     {
                         await webSocketHandler.ReceiveAsync(socketType, result, buffer);
-                        return;
                     }
-
+                    else if (result.MessageType == WebSocketMessageType.Binary)
+                    {
+                        await webSocketHandler.ReceiveBinaryAsync(socketType, result, buffer);
+                    }
                     else if (result.MessageType == WebSocketMessageType.Close)
                     {
                         await webSocketHandler.OnDisconnected(socketType);
-                        return;
                     }
 
                 });
@@ -59,7 +64,7 @@ namespace ConnorWebSockets.Middleware
 
         private async Task Receive(T socketType, Action<WebSocketReceiveResult, byte[]> handleMessage)
         {
-            var buffer = new byte[1024 * 4];
+            var buffer = new byte[bufferSize];
 
             while (socketType.Socket.State == WebSocketState.Open)
             {

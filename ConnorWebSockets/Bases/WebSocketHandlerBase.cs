@@ -61,6 +61,6 @@ namespace ConnorWebSockets.Bases
         }
 
         public abstract Task ReceiveAsync(T socket, WebSocketReceiveResult result, byte[] buffer);
-
+        public abstract Task ReceiveBinaryAsync(T socket, WebSocketReceiveResult result, byte[] buffer);
     }
 }

@@ -2,10 +2,10 @@
 
   
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <!-- For NuGet -->
     <PackageId>ConnorWebSockets</PackageId>
-    <Version>5.2.0</Version>
+    <Version>6.0.0</Version>
     <Authors>Connor Vargas</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -13,14 +13,14 @@
     <PackageProjectUrl>https://github.com/ConnorV645/ConnorWebSockets</PackageProjectUrl>
     <PackageIcon>icon1.png</PackageIcon>
     <Description>Create a definable wrapper around WebSockets that allow for easy storage of related information.</Description>
-    <AssemblyVersion>5.2.0.0</AssemblyVersion>
-    <FileVersion>5.2.0.0</FileVersion>
+    <AssemblyVersion>6.0.0.0</AssemblyVersion>
+    <FileVersion>6.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-    <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="StackExchange.Redis" Version="2.5.61" />
     <None Include="icon1.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
